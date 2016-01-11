@@ -1,0 +1,23 @@
+{
+  "name": "herenow",
+  "version": "1.0.0",
+  "description": "https://herenow.pw/ website",
+  "main": "index.js",
+  "dependencies": {
+    "gulp-sass": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/herenow/herenow.git"
+  },
+  "author": "herenow",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/herenow/herenow/issues"
+  },
+  "homepage": "https://github.com/herenow/herenow#readme"
+}
