@@ -1,0 +1,37 @@
+.homepage {
+    @include outer-container;
+    position: relative;
+
+    &__sidebar {
+        @include span-columns(12);
+
+        @include media($tablet-and-up) {
+            @include span-columns(3);
+            position: absolute;
+            right: 0;
+
+            &__fixed-wrapper {
+                width: inherit;
+                padding: 0;
+                position: fixed;
+            }
+        }
+
+        @include media($mobile) {
+            text-align: center;
+        }
+    }
+
+    &__articles {
+        @include span-columns(12);
+
+        @include media($tablet-and-up) {
+            @include span-columns(5);
+        }
+
+        @include media($mobile) {
+            text-align: center;
+            padding-top: 40px;
+        }
+    }
+}

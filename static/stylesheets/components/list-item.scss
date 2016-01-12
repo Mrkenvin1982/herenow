@@ -1,0 +1,22 @@
+.list-item {
+    @include row;
+
+    font-size: 1.4em;
+
+    @include media($mobile) {
+        padding: 20px;
+        border-top: 1px solid $light-gray;
+    }
+
+    &__title {
+        margin: 5px 0px;
+    }
+
+    &__link {
+        color: $base-font-color;
+    }
+
+    &__date {
+        font-size: 0.6em;
+    }
+}
