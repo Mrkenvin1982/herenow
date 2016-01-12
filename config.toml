@@ -1,3 +1,7 @@
-baseurl = "http://replace-this-with-your-hugo-site.com/"
+baseurl = "https://herenow.pw/"
 languageCode = "en-us"
-title = "My New Hugo Site"
+title = "herenow"
+copyright = "No rights reserved."
+
+[author]
+    name = "Leo Oshiro"

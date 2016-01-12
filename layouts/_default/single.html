@@ -1,0 +1,14 @@
+{{ partial "head.html" . }}
+
+<body lang="en">
+    {{ partial "navbar.html" .  }}
+
+    <main class="article">
+        <h1 itemprop="name headline" class="article__header">{{ .Title  }}</h1>
+        <h2 itemprop="description alternativeHeadline" class="article__subheader">{{ .Description  }}</h2>
+
+        <article itemprop="articleBody" class="article__body">
+            {{ .Content  }}
+        </article>
+    </main>
+</body>

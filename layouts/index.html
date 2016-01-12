@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+
+    <base href="{{ .Site.BaseURL }}">
+
+    {{ partial "metatags.html" . }}
+
+    <title>{{ .Site.Title }}</title>
+
+    <link rel="stylesheet" href="/bundles/layout.css">
+</head>
+
+<body lang="en">
+    {{ partial "navbar.html" .  }}
+
+    <main class="homepage">
+        <aside class="sidebar homepage__sidebar">
+            <div class="homepage__sidebar__fixed-wrapper">
+                <h1 class="sidebar__my_name">herenow</h1>
+                <p class="sidebar__random">
+                    void func dictionary() {</br>
+                    <span class="sidebar__tab"><a href="https://www.urbandictionary.com/random.php">random();</a></span><br/>
+                    }<br/>
+                </p>
+
+                <h2 class="sidebar__h2">Follow this blog</h2>
+
+                <section>
+                    <a class="github-button" href="https://github.com/herenow/herenow" data-icon="octicon-eye" data-count-href="/herenow/herenow/watchers" data-count-api="/repos/herenow/herenow#subscribers_count" data-count-aria-label="# watchers on GitHub" aria-label="Watch herenow/herenow on GitHub">Watch</a>
+
+                    <a class="github-button" href="https://github.com/herenow/herenow" data-icon="octicon-star" data-count-href="/herenow/herenow/stargazers" data-count-api="/repos/herenow/herenow#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star herenow/herenow on GitHub">Star</a>
+                </section>
+
+                <h2 class="sidebar__h2">Contribute</h2>
+
+                <section>
+                    <a class="github-button" href="https://github.com/herenow/herenow/issues" data-icon="octicon-issue-opened" data-count-api="/repos/herenow/herenow#open_issues_count" data-count-aria-label="# issues on GitHub" aria-label="Issue herenow/herenow on GitHub">Issue</a>
+
+                    <a class="github-button" href="https://github.com/herenow/herenow/fork" data-icon="octicon-repo-forked" data-count-href="/herenow/herenow/network" data-count-api="/repos/herenow/herenow#forks_count" data-count-aria-label="# forks on GitHub" aria-label="Fork herenow/herenow on GitHub">Fork</a>
+                </section>
+            </div>
+        </aside>
+
+        <section class="articles-list homepage__articles">
+            {{ range .Data.Pages }}
+                {{ .Render "list-item"}}
+            {{ end }}
+        </section>
+    </main>
+
+    <!-- Place this tag right after the last button or just before your close body tag. -->
+    <script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+</body>

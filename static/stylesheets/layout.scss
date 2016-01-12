@@ -1,3 +1,14 @@
 @import "bourbon/bourbon";
-@import "neat/neat";
 @import "base/base";
+@import "neat/neat";
+
+// Pages styles
+@import "pages/homepage";
+
+// Components
+@import "components/navbar";
+@import "components/sidebar";
+@import "components/articles-list";
+@import "components/list-item";
+@import "components/article";
+

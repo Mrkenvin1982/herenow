@@ -1,0 +1,22 @@
+.article {
+    @include outer-container;
+
+    &__header {
+        text-align: center;
+        color: $dark-gray;
+        font-size: 2em;
+    }
+
+    &__subheader {
+        text-align: center;
+        color: $light-gray;
+        font-size: 1em;
+    }
+
+    &__body {
+        color: $dark-gray;
+        font-size: 1em;
+        padding: 30px 0px;
+        text-align: justify;
+    }
+}
