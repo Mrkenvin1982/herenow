@@ -15,7 +15,9 @@ This works great in most cases, since ActionCable and the App (website) run on t
 
 But I run my website on Heroku behind [Cloudflare](https://www.cloudflare.com/), and it does not accept websocket connections on lower
 tier plans. Since I use Cloudflare for the SSL, I couldn't just connect to the websocket server on a different subdomain with Cloudflare
-disabled and share the cookies on a domain level, the browser would still expect a valid SSL connection on that server.
+disabled and share the cookies on a domain level, the browser would still expect a valid SSL connection on that endpoint. Sure, one could just
+purchase and maintain a SSL for this especial websocket endpoint, but I find that maintaining a SSL endpoint it too much of a hassle. You might
+not be allowed to just share the user_id cookie with the entire domain.
 
 So I needed to figure another way to send the `user_id` to the ActionCable server.
 
@@ -143,13 +145,13 @@ The signed user_id is an unchanging secret, by rendering it on the html it has a
 chance of being leaked/exposed, then when it was shared via cookies. A user might save the
 webpage and share it, forever exposing the actioncable authentication secret, for example.
 
-One might call this a feature though, now your realtime app still works when the webpage is saved and shared.
+One might call this a feature though ¯\_(ツ)_/¯, now your realtime app still works when the webpage is saved.
 
-The ideal solution is to move to a token based, so instead of encrypting the `user_id`, we would generate
+The ideal solution is to move to a token based approach, so instead of encrypting the `user_id`, we would generate
 a token, render it on the html, and use it to connect to the actioncable server. This token could then
 have an expiration date and/or be invalidated when used.
 
-Note that sharing the signed `user_id` via cookies does not make you safe either, it can still be leaked.
+Note that sharing the encrypted `user_id` via cookies does not make you safe either, it can still be leaked.
 
 Rails will probably move to a token based authentication scheme in the future, ActionCable is still new.
 
