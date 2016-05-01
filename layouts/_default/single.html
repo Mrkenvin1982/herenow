@@ -10,5 +10,7 @@
         <article itemprop="articleBody" class="article__body">
             {{ .Content  }}
         </article>
+
+        {{ template "_internal/disqus.html" .  }}
     </main>
 </body>
