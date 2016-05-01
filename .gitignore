@@ -58,3 +58,7 @@ node_modules/
 ####################
 sftp-config*
 *.sublime-*
+
+
+# Builds folder
+/public
