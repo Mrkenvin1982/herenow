@@ -5,3 +5,7 @@ copyright = "No rights reserved."
 
 [author]
     name = "Leo Oshiro"
+
+[blackfriday]
+  plainIDAnchors = true
+
