@@ -1,9 +1,9 @@
 +++
 categories = ["Ruby on Rails"]
 date = "2016-05-01T00:45:16-03:00"
-description = "How I ran my Actioncable server behind Cloudflare, on a different subdomain, without sharing cookies"
+description = "Authenticate with your Actioncable server without having to share cookies with the domain that the Actioncable server is at"
 tags = ["development", "ruby on rails", "actioncable", "rails 5", "cloudflare"]
-title = "Running Actioncable on Different Domain"
+title = "Running Actioncable on Different Domain Without Sharing Cookies"
 +++
 
 ## Prelude
@@ -154,4 +154,12 @@ have an expiration date and/or be invalidated when used.
 Note that sharing the encrypted `user_id` via cookies does not make you safe either, it can still be leaked.
 
 Rails will probably move to a token based authentication scheme in the future, ActionCable is still new.
+
+---------
+
+***UPDATE (May 5, 2016)***
+
+Cloudflare has included websocket support on all plans, read more at:
+
+https://support.cloudflare.com/hc/en-us/articles/200169466-Can-I-use-CloudFlare-with-WebSockets-
 
