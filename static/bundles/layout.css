@@ -186,6 +186,10 @@ body {
   margin: 0px;
   padding: 0px; }
 
+code {
+  padding: 2px 5px;
+  background-color: #eee; }
+
 html {
   box-sizing: border-box; }
 
