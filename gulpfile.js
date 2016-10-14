@@ -2,7 +2,6 @@
 
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
 var bulkSass = require('gulp-sass-bulk-import');
 
 // Configuration
@@ -25,9 +24,7 @@ gulp.task('sass', function () {
     gulp.src(BUILD_PATHS.stylesheets)
         .pipe(bulkSass())
         .pipe(sass().on('error', sass.logError))
-        .pipe(sourcemaps.init())
         .pipe(sass())
-        .pipe(sourcemaps.write())
         .pipe(gulp.dest(BUNDLE_PATH));
 });
 
