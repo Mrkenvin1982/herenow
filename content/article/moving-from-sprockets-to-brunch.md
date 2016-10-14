@@ -45,13 +45,13 @@ You can migrate to Brunch in 4 easy steps:
 
 ## <a name="install-and-setup-brunch"></a> 1. Install & Setup Brunch
 
-#### Install brunch cli
+### Install brunch cli
 
 ```bash
 $ npm install -g brunch
 ```
 
-#### Create a package.json
+### Create a package.json
 
 Add the following `package.json` to your projects root folter.
 
@@ -92,7 +92,7 @@ installed, which may alter the final bundle.
 Note that you only really need `brunch`, `babel-brunch`, `javascript-brunch` and `uglify-js-brunch` to get brunch
 working. All the rest are optional dependencies.
 
-#### Create a brunch-config.js
+### Create a brunch-config.js
 
 Add the following `brunch-config.js` to your projects root folder.
 
@@ -165,7 +165,7 @@ exports.config = {
 };
 ```
 
-#### Config assets for precompilation
+### Config assets for precompilation
 
 Don't forget to add the new `app-bundle.js` and `vendor-bundle.js` for precompilation, add this to your `config/initializers/assets.rb`.
 
@@ -177,7 +177,7 @@ config.assets.precompile += %w(
 )
 ```
 
-#### Link the bundles to your app
+### Link the bundles to your app
 
 It's time to link our bundles to our app, you can require them on your already existing javascript bundle or include them in
 your app's layout.
@@ -200,7 +200,7 @@ Add this to your `app/views/layouts/application.html.erb`:
 <%= javascript_include_tag 'app-bundle' %>
 ```
 
-#### Add to your .gitignore
+### Add to your .gitignore
 
 ***.gitignore***
 ```
@@ -212,7 +212,7 @@ npm-debug.log*
 /app/assets/javascripts/*-bundle.js.map
 ```
 
-#### Starting Brunch with Rails
+### Starting Brunch with Rails
 
 Now we have to always remember to start `brunch watch` with our Rails server.
 
@@ -241,7 +241,7 @@ Create your `app/assets/brunch/javascripts/app.js`, it will automatically be req
 
 ## <a name="prepare-assets-precompilation"></a> 3. Prepare assets precompilation (for deployment)
 
-#### Precompilng assets
+### Precompilng assets
 
 We need to tap into rails `assets:precompile` task and add Brunch to it.
 
@@ -273,7 +273,7 @@ namespace :assets do
 end
 ```
 
-#### Deploying to Heroku
+### Deploying to Heroku
 
 If you plan on deploying to Heroku, you will need a nodejs environment, add `heroku/nodejs` buidpack to your app.
 
