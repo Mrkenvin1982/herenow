@@ -4,6 +4,7 @@
   "description": "https://herenow.pw/ website",
   "main": "index.js",
   "dependencies": {
+    "gulp-rev": "^7.1.2",
     "gulp-sass": "^2.1.1"
   },
   "devDependencies": {
