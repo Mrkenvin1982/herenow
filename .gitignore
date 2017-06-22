@@ -62,3 +62,4 @@ sftp-config*
 
 # Builds folder
 /public
+public
