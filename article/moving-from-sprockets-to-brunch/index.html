@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+
+    <meta name="description" content="How to move your javascript from Rails&#39; Sprockets pipeline to Brunch.">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="canonical" href="https://herenow.pw/article/moving-from-sprockets-to-brunch/">
+
+
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content="How to move your javascript from Rails&#39; Sprockets pipeline to Brunch."/>
+<meta property="og:title" content="Moving Assets from Sprockets to Brunch"/>
+<meta property="og:site_name" content=""/>
+<meta property="og:image" content="" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="" />
+<meta property="og:image:height" content="" />
+<meta property="og:url" content="https://herenow.pw/article/moving-from-sprockets-to-brunch/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-09-01"/>
+<meta property="article:modified_time" content="2016-09-01"/>
+
+
+
+<meta property="article:tag" content="development"><meta property="article:tag" content="ruby on rails"><meta property="article:tag" content="brunch"><meta property="article:tag" content="frontend"><meta property="article:tag" content="react">
+
+
+
+
+    <title>Moving Assets from Sprockets to Brunch | herenow.pw</title>
+
+    <link rel="stylesheet" href="/bundles/layout-cf1683a85f.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/tomorrow-night.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+<script type="text/javascript">
+var anchorForId = function (id) {
+  var anchor = document.createElement("a");
+  anchor.className = "header-link";
+  anchor.href      = "#" + id;
+  return anchor;
+};
+
+var linkifyAnchors = function (level, containingElement) {
+  var headers = containingElement.getElementsByTagName("h" + level);
+  for (var h = 0; h < headers.length; h++) {
+    var header = headers[h];
+
+    if (typeof header.id !== "undefined" && header.id !== "") {
+      header.appendChild(anchorForId(header.id));
+    }
+  }
+};
+
+document.onreadystatechange = function () {
+  if (this.readyState === "complete") {
+    var contentBlock = document.body;
+
+    for (var level = 1; level <= 6; level++) {
+      linkifyAnchors(level, contentBlock);
+    }
+  }
+};
+</script>
+
+
+<script type="text/javascript">
+!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
+analytics.load("slj7en6e88dd6n8sUswAKlC1yX1ZlN38");
+analytics.page()
+}}();
+</script>
+
+</head>
+
+
+
+<body lang="en">
+    <nav class="navbar">
+    <ul class="navbar__menu">
+        <li class="navbar__item">
+            <a class="navbar__link" href="/">Articles</a>
+        </li>
+    </ul>
+</nav>
+
+
+
+    <main class="article">
+        <h1 itemprop="name headline" class="article__header">Moving Assets from Sprockets to Brunch</h1>
+        <h2 itemprop="description alternativeHeadline" class="article__subheader">How to move your javascript from Rails&#39; Sprockets pipeline to Brunch.</h2>
+
+        <article itemprop="articleBody" class="article__body">
+            
+
+<h2 id="considerations">Considerations</h2>
+
+<p>First of all, this is not a complete migration to Brunch, we are only moving our javascript to Brunch, all other assets, such
+as stylsheets, images and fonts may will remain in Rails&rsquo; regular asset pipeline. I don&rsquo;t think there are any benefit of moving them
+to Brunch.</p>
+
+<p>We will also still need Sprockets to digest and build our assets manifest.</p>
+
+<h2 id="why-brunch">Why Brunch</h2>
+
+<p>If you are reading this article, you are probably already interested in <a href="http://brunch.io/">brunch.io</a>. I first found Brunch in <a href="http://www.phoenixframework.org/">Phoenix</a>,
+I immediately fell in love with it, it had such a simple configuration.</p>
+
+<p>Our js code was already modulerized using <a href="https://larsjung.de/modulejs/">modulejs</a>, so it was easy to move it to Brunch&rsquo;s module system.</p>
+
+<p>I&rsquo;d probably have sticked with Sprockets and rails-assets (bower), but I really missed npm modules and the whole babel ecosystem. I&rsquo;m also planning on getting HMR (Hot Module Replacement) going.</p>
+
+<p>Brunch is awesome because it is simple, and that is the main reason I chose it. It is not nearly as well rounded as Webpack, nor is the community as good, but Webpack&rsquo;s complexity may not be worth it, especially for a team of full-stack developers like ours, that may struggle with Webpack. Brunch gets you 80% there, and it&rsquo;s good enough for me.</p>
+
+<h2 id="migrating-from-sprockets-to-brunch">Migrating from Sprockets to Brunch</h2>
+
+<p>You can migrate to Brunch in 4 easy steps:</p>
+
+<ul>
+<li>1. <a href="#install-and-setup-brunch">Install &amp; Setup Brunch</a></li>
+<li>2. <a href="#move-assets-to-brunch">Move assets over to Brunch</a></li>
+<li>3. <a href="#prepare-assets-precompilation">Prepare assets precompilation (for deployment)</a></li>
+<li>4. <a href="#getting-react-rails-to-work">Getting React (react-rails) to work</a></li>
+</ul>
+
+<p><br/></p>
+
+<p><img src="/images/gifs/thats-too-easy.gif" alt="It's easy gif" /></p>
+
+<p><br/></p>
+
+<h2 id="a-name-install-and-setup-brunch-a-1-install-setup-brunch"><a name="install-and-setup-brunch"></a> 1. Install &amp; Setup Brunch</h2>
+
+<h3 id="install-brunch-cli">Install brunch cli</h3>
+
+<pre><code class="language-bash">$ npm install -g brunch
+</code></pre>
+
+<h3 id="create-a-package-json">Create a package.json</h3>
+
+<p>Add the following <code>package.json</code> to your projects root folter.</p>
+
+<p><strong><em>package.json</em></strong></p>
+
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;my-app&quot;,
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;brunch build&quot;,
+    &quot;build:production&quot;: &quot;brunch build --production&quot;,
+    &quot;watch&quot;: &quot;brunch watch --stdin&quot;
+  },
+  &quot;devDependencies&quot;: {
+    &quot;babel-brunch&quot;: &quot;^6.0.5&quot;,
+    &quot;babel-plugin-add-module-exports&quot;: &quot;^0.2.1&quot;,
+    &quot;babel-plugin-syntax-trailing-function-commas&quot;: &quot;^6.8.0&quot;,
+    &quot;babel-preset-es2016&quot;: &quot;^6.11.3&quot;,
+    &quot;babel-preset-react&quot;: &quot;^6.11.1&quot;,
+    &quot;brunch&quot;: &quot;~2.7.7&quot;,
+    &quot;javascript-brunch&quot;: &quot;^2.0.0&quot;,
+    &quot;uglify-js-brunch&quot;: &quot;^2.0.1&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;jquery&quot;: &quot;^3.1.0&quot;,
+    &quot;react&quot;: &quot;^15.2.1&quot;,
+    &quot;react-dom&quot;: &quot;^15.2.1&quot;
+  }
+}
+</code></pre>
+
+<p>For organizational purposes, we will use <code>devDependencies</code> to define any dev/build related dependency we may need
+to build our assets, and <code>dependencies</code> for libraries we will require in our code.</p>
+
+<p>I&rsquo;m still considering putting the <code>devDependencies</code> in <code>dependencies</code>, so we can shrinkwrap them, and guarrantee that
+the bundle generated in production or any environment is always the same. Since a different babel preset version may be
+installed, which may alter the final bundle.</p>
+
+<p>Note that you only really need <code>brunch</code>, <code>babel-brunch</code>, <code>javascript-brunch</code> and <code>uglify-js-brunch</code> to get brunch
+working. All the rest are optional dependencies.</p>
+
+<h3 id="create-a-brunch-config-js">Create a brunch-config.js</h3>
+
+<p>Add the following <code>brunch-config.js</code> to your projects root folder.</p>
+
+<p><strong><em>brunch-config.js</em></strong></p>
+
+<pre><code class="language-js">exports.config = {
+  conventions: {
+    // Don't compile static assets folder into public folder.
+    assets: (() =&gt; false),
+  },
+
+  paths: {
+    watched: [
+      &quot;app/assets/brunch&quot;,
+    ],
+
+    // Compile brunch assets to rails assets folder
+    // so Sprockets can still see them.
+    //
+    // Sprockets will still handle digesting the assets
+    // and putting them on the public folder
+    //
+    // Note that we need to name the bundles (joinTo) with
+    // the output path we want them to go, for example:
+    // `javascripts/app.js` will compile to `app/assets/javascripts/app.js`
+    public: &quot;app/assets&quot;,
+  },
+
+  files: {
+    javascripts: {
+      // This bundle will be copied over to `app/assets/javascripts`
+      // and then we fallback to rails regular asset pipeline.
+      joinTo: {
+        &quot;javascripts/app-bundle.js&quot;: /^app\/assets\/brunch\/javascripts/,
+        &quot;javascripts/vendor-bundle.js&quot;: /^(node_modules)/,
+      },
+    },
+  },
+
+  // Configure your plugins
+  plugins: {
+    babel: {
+      plugins: [
+        'syntax-trailing-function-commas',
+      ],
+      presets: [
+        'es2015',
+        'es2016',
+        'react',
+      ],
+    },
+  },
+
+  modules: {
+    // Remove javascript assets path from module registration name, ex:
+    // require(&quot;assets/brunch/javascripts/app.js&quot;) is now require(&quot;app.js&quot;)
+    nameCleaner: (path) =&gt; {
+      return path.replace(/^app\/assets\/brunch\/javascripts\//, '');
+    },
+    autoRequire: {
+      &quot;javascripts/app-bundle.js&quot;: [
+        &quot;app.js&quot;,
+      ],
+    }
+  },
+
+  npm: {
+    enabled: true,
+  },
+};
+</code></pre>
+
+<h3 id="config-assets-for-precompilation">Config assets for precompilation</h3>
+
+<p>Don&rsquo;t forget to add the new <code>app-bundle.js</code> and <code>vendor-bundle.js</code> for precompilation, add this to your <code>config/initializers/assets.rb</code>.</p>
+
+<p><strong><em>config/initializers/assets.rb</em></strong></p>
+
+<pre><code class="language-ruby">config.assets.precompile += %w(
+  app-bundle.js
+  vendor-bundle.js
+)
+</code></pre>
+
+<h3 id="link-the-bundles-to-your-app">Link the bundles to your app</h3>
+
+<p>It&rsquo;s time to link our bundles to our app, you can require them on your already existing javascript bundle or include them in
+your app&rsquo;s layout.</p>
+
+<p>Add this to your <code>app/assets/javascripts/application.js</code>:</p>
+
+<p><strong><em>app/assets/javascripts/application.js</em></strong></p>
+
+<pre><code class="language-js">//= require ./app-bundle
+//= require ./vendor-bundle
+</code></pre>
+
+<p><strong><em>OR</em></strong></p>
+
+<p>Add this to your <code>app/views/layouts/application.html.erb</code>:</p>
+
+<p><strong><em>app/views/layouts/application.html.erb</em></strong></p>
+
+<pre><code class="language-ruby">&lt;%= javascript_include_tag 'vendor-bundle' %&gt;
+&lt;%= javascript_include_tag 'app-bundle' %&gt;
+</code></pre>
+
+<h3 id="add-to-your-gitignore">Add to your .gitignore</h3>
+
+<p><strong><em>.gitignore</em></strong></p>
+
+<pre><code># Npm debug files
+npm-debug.log*
+
+# Brunch compiled js bundles
+/app/assets/javascripts/*-bundle.js
+/app/assets/javascripts/*-bundle.js.map
+</code></pre>
+
+<h3 id="starting-brunch-with-rails">Starting Brunch with Rails</h3>
+
+<p>Now we have to always remember to start <code>brunch watch</code> with our Rails server.</p>
+
+<p>If you use foreman to start your app, add this to your <code>Procfile.dev</code> (if you use one to manage development app startup).</p>
+
+<p><strong><em>Procfile.dev</em></strong></p>
+
+<pre><code>web: rails server
+brunch: brunch watch
+</code></pre>
+
+<p>Then you may start your rails server with <code>foreman start -f Procfile.dev</code>.</p>
+
+<p>If you don&rsquo;t use foreman, don&rsquo;t forget to start <code>brunch watch</code> with <code>rails server</code>.</p>
+
+<h2 id="a-name-move-assets-to-brunch-a-2-move-assets-over-to-brunch"><a name="move-assets-to-brunch"></a> 2. Move assets over to Brunch</h2>
+
+<p>Now, all your javascript will live in <code>app/assets/brunch/javascripts</code>, it starts at <code>app.js</code>.</p>
+
+<p>You don&rsquo;t need to require everything you will need in the bundle, Brunch automatically bundles everything in the
+<code>app/assets/brunch/javascripts</code> folder. You do need to require your dependencies though</p>
+
+<p>Create your <code>app/assets/brunch/javascripts/app.js</code>, it will automatically be required by Brunch, since we configured an <code>autoRequire</code>.</p>
+
+<h2 id="a-name-prepare-assets-precompilation-a-3-prepare-assets-precompilation-for-deployment"><a name="prepare-assets-precompilation"></a> 3. Prepare assets precompilation (for deployment)</h2>
+
+<h3 id="precompilng-assets">Precompilng assets</h3>
+
+<p>We need to tap into rails <code>assets:precompile</code> task and add Brunch to it.</p>
+
+<p>Add/create the following code in <code>lib/tasks/assets.rake</code>.</p>
+
+<p><strong><em>lib/tasks/assets.rake</em></strong></p>
+
+<pre><code>namespace :assets do
+  desc &quot;Build brunch assets for production&quot;
+  task :brunch_build  do
+    sh 'npm run build:production' do |ok, res|
+      unless ok
+        puts &quot;Failed to build brunch assets (exit status = #{res.exitstatus})&quot;
+        exit
+      end
+    end
+  end
+
+  # We need to run `brunch build` before the assets:environment task.
+  #
+  # Or when sprockets runs the precompile task, it won't find our
+  # brunch generated bundles.
+  Rake::Task['assets:precompile']
+    .clear_prerequisites
+    .enhance([
+      'assets:brunch_build',
+      'assets:environment',
+    ])
+end
+</code></pre>
+
+<h3 id="deploying-to-heroku">Deploying to Heroku</h3>
+
+<p>If you plan on deploying to Heroku, you will need a nodejs environment, add <code>heroku/nodejs</code> buidpack to your app.</p>
+
+<p><strong><em>.buildpack</em></strong></p>
+
+<pre><code>heroku/nodejs
+heroku/ruby
+</code></pre>
+
+<h2 id="a-name-getting-react-rails-to-work-a-4-getting-react-react-rails-to-work"><a name="getting-react-rails-to-work"></a> 4. Getting React (react-rails) to work</h2>
+
+<p>Getting react-rails to work with Brunch is tricky if you plan on doing server rendering. Brunch builds don&rsquo;t play well with
+Node.js, because its <code>require</code> conflicts with node&rsquo;s local <code>require</code>, I opened an issue about it at #1465(<a href="https://github.com/brunch/brunch/issues/1465">https://github.com/brunch/brunch/issues/1465</a>).</p>
+
+<p>It&rsquo;s not hard to fix, and it should probably be fixed soon, but Brunch&rsquo;s ecosystem doesn&rsquo;t seem as friendly as Webpack&rsquo;s for folks doing React and isomorphic apps in general.</p>
+
+<p>For now, here&rsquo;s how my react-rails setup looks like:</p>
+
+<p><strong><em>First</em></strong>, don&rsquo;t use Node.js as ExecJS&rsquo;s runtime, it will not work with our bundle because of the issue I described above. You can use either
+<strong><em>therubyracer</em></strong> or <strong><em>mini_racer</em></strong> (any runtime that uses v8 directly), I prefer <strong><em>mini_racer</em></strong>, so add it to your <code>Gemfile</code>:</p>
+
+<p><strong><em>Gemfile</em></strong></p>
+
+<pre><code>gem 'mini_racer'
+</code></pre>
+
+<p><strong><em>Second</em></strong>, add a new <code>server.js</code> entry point to your <code>brunch-config.js</code>, this build will be responsible for exposing our React components to react-rails. Don&rsquo;t forget
+to also add <code>react</code> babel preset. You should add the following to your already existing <code>brunch-config.js</code>.</p>
+
+<p><strong><em>brunch-config.js</em></strong></p>
+
+<pre><code class="language-js">...
+
+  files: {
+    javascripts: {
+      joinTo: {
+        &quot;javascripts/app-bundle.js&quot;: /^app\/assets\/brunch\/javascripts/,
+        &quot;javascripts/vendor-bundle.js&quot;: /^(node_modules)/,
+      },
+      entryPoints: {
+        &quot;app/assets/brunch/javascripts/server.js&quot;: &quot;javascripts/server-bundle.js&quot;,
+      }
+    },
+  },
+
+  // Configure your plugins
+  plugins: {
+    babel: {
+      presets: [
+        'es2015',
+        'es2016',
+        'react',
+      ],
+    }
+  },
+
+  modules: {
+    autoRequire: {
+      &quot;javascripts/app-bundle.js&quot;: [
+        &quot;app.js&quot;,
+      ],
+      &quot;javascripts/server-bundle.js&quot;: [
+        &quot;server.js&quot;,
+      ],
+    }
+  },
+...
+</code></pre>
+
+<p><strong><em>Third</em></strong>, create your <code>server.js</code>, and start registering your components, I&rsquo;ve actually separated my components in a <code>components.js</code>, so
+I can share them with my <code>app.js</code> since not all components are server rendered, some are handled by react_ujs.</p>
+
+<p><strong><em>app/assets/brunch/javascripts/server.js</em></strong></p>
+
+<pre><code class="language-js">// This bundle is imported by the server for server rendering
+// Import and expose each component here, it will expects react
+// components to be available on the global context (window|global).
+
+// Find the global context
+var globals = (typeof window === 'undefined' ? global : window);
+
+// Expose React dependencies globally
+globals.React = require('react');
+globals.ReactDOM = require('react-dom');
+globals.ReactDOMServer = require('react-dom/server');
+
+// Register react components
+require('components');
+</code></pre>
+
+<p><strong><em>app/assets/brunch/javascripts/components.js</em></strong></p>
+
+<pre><code class="language-js">// List of react components we need to expose to
+// the global context, for:
+// A) Pre-rendering: react-rails will look for components in the global context.
+// b) react_ujs: react_ujs also expects components on the global context.
+//
+// If the react component is not present in this file, it won't be available.
+
+var globals = (typeof window === 'undefined' ? global : window);
+
+// Components
+globals.ComponentName = require('components/component-path');
+</code></pre>
+
+<p><strong><em>Forth</em></strong>, at last, we need to make <code>react-rails</code> aware of our setup, since we are not following its conventions anymore. Find your
+<code>config.react.server_renderer_options</code> &amp; <code>config.watchable_files</code> config, mine was at <code>config/application.rb</code>. Edit them to the following:</p>
+
+<p><strong><em>config/application.rb</em></strong></p>
+
+<pre><code class="language-ruby">config.react.server_renderer_options = {
+  files: [&quot;server-bundle.js&quot;], # files to load for prerendering
+  replay_console: true,        # if true, console.* will be replayed client-side
+}
+
+# Reload our server rendering engine/server whenever our bundle changes
+# This is very important, since, by default, react-rails only watches for
+# changes in `.jsx` files inside `app/assets/javascripts`, and our js assets
+# are in a different folder now.
+config.watchable_files.concat Dir[&quot;#{config.root}/app/assets/javascripts/server-bundle.js&quot;]
+</code></pre>
+
+<h2 id="miscellaneous">Miscellaneous</h2>
+
+<h3 id="ci-environment">CI Environment</h3>
+
+<p>You will need to build your assets before running your tests in your CI server, unless your are already precompiling your assets before running your
+tests for some odd reason.</p>
+
+<p>In CircleCI it was as easy as adding this to my <code>circle.yml</code>:</p>
+
+<p><strong><em>circle.yml</em></strong></p>
+
+<pre><code>dependencies:
+  post:
+    - npm run build # Build brunch assets
+</code></pre>
+
+        </article>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'herenowpw';
+    var disqus_identifier = 'https:\/\/herenow.pw\/article\/moving-from-sprockets-to-brunch\/';
+    var disqus_title = 'Moving Assets from Sprockets to Brunch';
+    var disqus_url = 'https:\/\/herenow.pw\/article\/moving-from-sprockets-to-brunch\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </main>
+</body>

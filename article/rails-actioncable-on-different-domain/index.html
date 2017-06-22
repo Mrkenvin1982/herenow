@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+
+    <meta name="description" content="Authenticate with your Actioncable server without having to share cookies with the domain that the Actioncable server is at">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="canonical" href="https://herenow.pw/article/rails-actioncable-on-different-domain/">
+
+
+
+ 
+<meta property="og:type" content="article"/>
+<meta property="og:description" content="Authenticate with your Actioncable server without having to share cookies with the domain that the Actioncable server is at"/>
+<meta property="og:title" content="Running Actioncable on Different Domain Without Sharing Cookies"/>
+<meta property="og:site_name" content=""/>
+<meta property="og:image" content="" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="" />
+<meta property="og:image:height" content="" />
+<meta property="og:url" content="https://herenow.pw/article/rails-actioncable-on-different-domain/">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-05-01"/>
+<meta property="article:modified_time" content="2016-05-01"/>
+
+
+
+<meta property="article:tag" content="development"><meta property="article:tag" content="ruby on rails"><meta property="article:tag" content="actioncable"><meta property="article:tag" content="rails 5"><meta property="article:tag" content="cloudflare">
+
+
+
+
+    <title>Running Actioncable on Different Domain Without Sharing Cookies | herenow.pw</title>
+
+    <link rel="stylesheet" href="/bundles/layout-cf1683a85f.css">
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/tomorrow-night.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+<script type="text/javascript">
+var anchorForId = function (id) {
+  var anchor = document.createElement("a");
+  anchor.className = "header-link";
+  anchor.href      = "#" + id;
+  return anchor;
+};
+
+var linkifyAnchors = function (level, containingElement) {
+  var headers = containingElement.getElementsByTagName("h" + level);
+  for (var h = 0; h < headers.length; h++) {
+    var header = headers[h];
+
+    if (typeof header.id !== "undefined" && header.id !== "") {
+      header.appendChild(anchorForId(header.id));
+    }
+  }
+};
+
+document.onreadystatechange = function () {
+  if (this.readyState === "complete") {
+    var contentBlock = document.body;
+
+    for (var level = 1; level <= 6; level++) {
+      linkifyAnchors(level, contentBlock);
+    }
+  }
+};
+</script>
+
+
+<script type="text/javascript">
+!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
+analytics.load("slj7en6e88dd6n8sUswAKlC1yX1ZlN38");
+analytics.page()
+}}();
+</script>
+
+</head>
+
+
+
+<body lang="en">
+    <nav class="navbar">
+    <ul class="navbar__menu">
+        <li class="navbar__item">
+            <a class="navbar__link" href="/">Articles</a>
+        </li>
+    </ul>
+</nav>
+
+
+
+    <main class="article">
+        <h1 itemprop="name headline" class="article__header">Running Actioncable on Different Domain Without Sharing Cookies</h1>
+        <h2 itemprop="description alternativeHeadline" class="article__subheader">Authenticate with your Actioncable server without having to share cookies with the domain that the Actioncable server is at</h2>
+
+        <article itemprop="articleBody" class="article__body">
+            
+
+<h2 id="prelude">Prelude</h2>
+
+<p>Rails 5 ActionCable standard setup expects your app to set a <code>user_id</code> signed cookie when you
+authenticate a user, and connect to the ActionCable server on the same domain, so the browser shares this cookie.</p>
+
+<p>This works great in most cases, since ActionCable and the App (website) run on the same server.</p>
+
+<p>But I run my website on Heroku behind <a href="https://www.cloudflare.com/">Cloudflare</a>, and it does not accept websocket connections on lower
+tier plans. Since I use Cloudflare for the SSL, I couldn&rsquo;t just connect to the websocket server on a different subdomain with Cloudflare
+disabled and share the cookies on a domain level, the browser would still expect a valid SSL connection on that endpoint. Sure, one could just
+purchase and maintain a SSL for this especial websocket endpoint, but I find that maintaining a SSL endpoint it too much of a hassle. You might
+not be allowed to just share the user_id cookie with the entire domain.</p>
+
+<p>So I needed to figure another way to send the <code>user_id</code> to the ActionCable server.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>Connect to an CloudFlare disabled subdomain and share the signed user id via query parameters.</p>
+
+<p><img src="/images/refs/disabled-cloudflare-subdomain.png" alt="cloudflare disabled subdomain image" /></p>
+
+<p>Then render the signed <code>user_id</code> in the DOM, and send it over query parameters.</p>
+
+<h3 id="first-expose-the-signed-user-id">First, expose the signed user id</h3>
+
+<p>Create a helper method so we can render the signed user_id in the view.</p>
+
+<pre><code class="language-ruby">class ApplicationController &lt; ActionController::Base
+  helper_method :signed_user_id
+
+  private
+
+  def signed_user_id
+    @signed_user_id ||= crypt.encrypt_and_sign(current_user.id) if current_user
+  end
+
+  def crypt
+    @crypt ||= ActiveSupport::MessageEncryptor.new(
+      Rails.application.secrets.secret_key_base,
+    )
+  end
+end
+</code></pre>
+
+<h3 id="second-render-it">Second, render it</h3>
+
+<p>Now, we need to render it somewhere, so we can later retrieve it via JS, I always like
+to have a global <code>AppConfig</code> variable, that I use to pass setup data to my JS app.</p>
+
+<pre><code class="language-html">&lt;script type=&quot;text/javascript&quot;&gt;
+  window.AppConfig = {
+    WEBSOCKET_HOST: &quot;&lt;%= ENV['WEBSOCKET_HOST'] %&gt;&quot;,
+    WEBSOCKET_PATH: &quot;&lt;%= ActionCable.server.config.mount_path %&gt;&quot;,
+  &lt;% if user_signed_in? %&gt;
+    WEBSOCKET_USER_ID_SECRET: &quot;&lt;%= signed_user_id %&gt;&quot;,
+  &lt;% end %&gt;
+  }
+&lt;/script&gt;
+</code></pre>
+
+<p>Put this code somewhere in your <code>application.html.erb</code> layout file , before your javascript files.</p>
+
+<p>When running the app, set the <code>WEBSOCKET_HOST</code> env to whatever domain you want to connect, for example <code>websocket.myapp.com:80</code>.</p>
+
+<p>I&rsquo;m not sure if we can trust <code>ActionCable.server.config.mount_path</code>, change it to whatever path your
+ActionCable server is mounted to if it doesn&rsquo;t work.</p>
+
+<h3 id="third-connect-to-it">Third, connect to it</h3>
+
+<p>Now we can connect to our ActionCable server, here is how I do it.</p>
+
+<pre><code class="language-js">var protocol = window.location.protocol === &quot;https:&quot; ? &quot;wss://&quot; : &quot;ws://&quot;;
+var host     = window.AppConfig.WEBSOCKET_HOST || window.location.host;
+var path     = window.AppConfig.WEBSOCKET_PATH || '/cable';
+var userId   = window.AppConfig.WEBSOCKET_USER_ID_SECRET;
+var url      = protocol + host + path;
+
+if(userId) {
+  url += '?user_id=' + encodeURIComponent(userId);
+}
+
+App.cable = ActionCable.createConsumer(url);
+</code></pre>
+
+<h3 id="lastly-authenticate-it">Lastly, authenticate it</h3>
+
+<p>Now, we need to update how our actioncable connection class authenticates users.</p>
+
+<pre><code class="language-ruby">module ApplicationCable
+  class Connection &lt; ActionCable::Connection::Base
+    identified_by :current_user
+
+    def connect
+      self.current_user = find_verified_user
+    end
+
+    protected
+
+    def find_verified_user
+      if current_user = User.find_by(id: user_id)
+        current_user
+      else
+        reject_unauthorized_connection
+      end
+    end
+
+    private
+
+    def user_id
+      signed_user_id = request.params.fetch(:user_id)
+
+      crypt.decrypt_and_verify(signed_user_id)
+    end
+
+    def crypt
+      @crypt ||= ActiveSupport::MessageEncryptor.new(
+        Rails.application.secrets.secret_key_base,
+      )
+    end
+  end
+end
+</code></pre>
+
+<h2 id="caveats">Caveats</h2>
+
+<p>Nothing is perfect, read below.</p>
+
+<p><img src="/images/gifs/welding-accident.gif" alt="funny gif" /></p>
+
+<h3 id="rendering-the-signed-user-id-in-the-dom-is-no-secure">Rendering the signed user id in the DOM is no secure</h3>
+
+<p>The signed user_id is an unchanging secret, by rendering it on the html it has a greater
+chance of being leaked/exposed, then when it was shared via cookies. A user might save the
+webpage and share it, forever exposing the actioncable authentication secret, for example.</p>
+
+<p>One might call this a feature though ¯_(ツ)_/¯, now your realtime app still works when the webpage is saved.</p>
+
+<p>The ideal solution is to move to a token based approach, so instead of encrypting the <code>user_id</code>, we would generate
+a token, render it on the html, and use it to connect to the actioncable server. This token could then
+have an expiration date and/or be invalidated when used.</p>
+
+<p>Note that sharing the encrypted <code>user_id</code> via cookies does not make you safe either, it can still be leaked.</p>
+
+<p>Rails will probably move to a token based authentication scheme in the future, ActionCable is still new.</p>
+
+<hr />
+
+<p><strong><em>UPDATE (May 5, 2016)</em></strong></p>
+
+<p>Cloudflare has included websocket support on all plans, read more at:</p>
+
+<p><a href="https://support.cloudflare.com/hc/en-us/articles/200169466-Can-I-use-CloudFlare-with-WebSockets-">https://support.cloudflare.com/hc/en-us/articles/200169466-Can-I-use-CloudFlare-with-WebSockets-</a></p>
+
+        </article>
+
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'herenowpw';
+    var disqus_identifier = 'https:\/\/herenow.pw\/article\/rails-actioncable-on-different-domain\/';
+    var disqus_title = 'Running Actioncable on Different Domain Without Sharing Cookies';
+    var disqus_url = 'https:\/\/herenow.pw\/article\/rails-actioncable-on-different-domain\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </main>
+</body>

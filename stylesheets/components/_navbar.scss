@@ -1,0 +1,20 @@
+.navbar {
+    @include outer-container;
+    padding: 10px;
+
+    &__menu {
+        font-size: 1.5em;
+        list-style: none;
+    }
+
+    &__item {
+        float: left;
+        margin: 10px;
+    }
+
+    &__link {
+        color: $base-font-color;
+        text-decoration: underline;
+        margin-right: 20px;
+    }
+}

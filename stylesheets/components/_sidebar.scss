@@ -1,0 +1,22 @@
+.sidebar {
+    font-size: 1.2em;
+
+    &__my_name {
+
+    }
+
+    &__random {
+        font-family: monospace; // Emulate <pre>
+        font-size: 0.8em;
+        background: $secondary-background-color;
+        text-align: left;
+    }
+
+    &__tab {
+        padding-left: 2em;
+    }
+
+    &__h2 {
+        padding-top: 2em;
+    }
+}

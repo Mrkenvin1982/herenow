@@ -1,0 +1,28 @@
+// Bitters 1.2.0
+// http://bitters.bourbon.io
+// Copyright 2013-2015 thoughtbot, inc.
+// MIT License
+
+@import "variables";
+
+// Neat Settings -- uncomment if using Neat -- must be imported before Neat
+@import "grid-settings";
+
+// Bitters styles
+@import "buttons";
+@import "forms";
+@import "lists";
+@import "tables";
+@import "typography";
+
+body {
+    background-color: $base-background-color;
+
+    margin: 0px;
+    padding: 0px 1em;
+}
+
+code {
+    padding: 2px 5px;
+    background-color: $lighter-gray;
+}
